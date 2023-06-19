@@ -1,169 +1,112 @@
 import React, { useState } from 'react';
-import CardFilter from './components/CardFilter';
-import CardListControls from './components/CardListControls';
-import Cards from './components/Cards';
-import CreateDeck from './components/CreateDeck';
-import DeckCardControls from './components/DeckCardControls';
-import FactionButtons from './components/FactionButtons';
-import Menu from './components/Menu';
-import PaginationButtons from './components/PaginationButtons';
-import SelectDeck from './components/SelectDeck';
-import Breadcrumb from './components/Breadcrumb';
 
-// Create DeckForm component
-const DeckForm = ({ onCreateDeck }) => {
-  const [faction, setFaction] = useState('');
+const Decks = () => {
+  const [factions, setFactions] = useState([]);
+  const [decks, setDecks] = useState([]);
+  const [selectedFaction, setSelectedFaction] = useState('');
   const [deckName, setDeckName] = useState('');
+  const [card, setCard] = useState(''); // Add card and setCard state variables
 
-  const handleFactionChange = (e) => {
-    setFaction(e.target.value);
-  };
+  const createDeck = () => {
+    const newDeck = {
+      faction: selectedFaction,
+      name: deckName,
+      cards: []
+    };
 
-  const handleDeckNameChange = (e) => {
-    setDeckName(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCreateDeck({ faction, deckName });
-    setFaction('');
+    setDecks([...decks, newDeck]);
+    setSelectedFaction('');
     setDeckName('');
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Faction:
-        <select value={faction} onChange={handleFactionChange}>
-          <option value="faction1">Faction 1</option>
-          <option value="faction2">Faction 2</option>
-          <option value="faction3">Faction 3</option>
-        </select>
-      </label>
-      <br />
-      <label>
-        Deck Name:
-        <input type="text" value={deckName} onChange={handleDeckNameChange} />
-      </label>
-      <br />
-      <button type="submit">Create Deck</button>
-    </form>
-  );
-};
+  const deleteDeck = (deckIndex) => {
+    const updatedDecks = decks.filter((_, index) => index !== deckIndex);
+    setDecks(updatedDecks);
+  };
 
-// Create Deck component
-const Deck = ({ faction, deckName }) => {
+  const addCardToDeck = (card) => {
+    if (decks.length === 0) {
+      return; // No decks exist yet, so we can't add the card
+    }
+  
+    const updatedDecks = [...decks];
+    updatedDecks[updatedDecks.length - 1].cards.push(card);
+    setDecks(updatedDecks);
+    setCard(''); // Clear the input field after adding the card
+  };
+  
+
+  const moveCardToDeck = (cardIndex, targetDeckIndex) => {
+    const updatedDecks = [...decks];
+    const card = updatedDecks[cardIndex].cards.pop();
+    updatedDecks[targetDeckIndex].cards.push(card);
+    setDecks(updatedDecks);
+  };
+
   return (
     <div>
-      <h3>Deck Name: {deckName}</h3>
-      <p>Faction: {faction}</p>
-    </div>
-  );
-};
+      <h2>Create a Deck</h2>
+      <label htmlFor="faction">Select a Faction:</label>
+      <select
+        id="faction"
+        value={selectedFaction}
+        onChange={(e) => setSelectedFaction(e.target.value)}
+      >
+        <option value="">Select Faction</option>
+        {factions.map((faction) => (
+          <option key={faction} value={faction}>
+            {faction}
+          </option>
+        ))}
+      </select>
 
-// Create Decks component
-const Decks = ({ decks }) => {
-  return (
-    <div>
-      <h2>Your Decks:</h2>
+      <label htmlFor="deckName">Name a Deck:</label>
+      <input
+        type="text"
+        id="deckName"
+        value={deckName}
+        onChange={(e) => setDeckName(e.target.value)}
+      />
+
+      <button onClick={createDeck}>Create Deck</button>
+
+      <h2>List of Deck Items</h2>
       {decks.map((deck, index) => (
-        <Deck key={index} faction={deck.faction} deckName={deck.deckName} />
+        <div key={index}>
+          <h3>{deck.name}</h3>
+          <p>Faction: {deck.faction}</p>
+          <button onClick={() => deleteDeck(index)}>Delete Deck</button>
+        </div>
+      ))}
+
+      <h2>Add a Card to a Deck</h2>
+      <input type="text" value={card} onChange={(e) => setCard(e.target.value)} />
+      <button onClick={() => addCardToDeck(card)}>Add Card</button>
+
+      <h2>Move a Card to another Deck</h2>
+      {decks.map((deck, deckIndex) => (
+        <div key={deckIndex}>
+          <h3>{deck.name}</h3>
+          {deck.cards.map((card, cardIndex) => (
+            <div key={cardIndex}>
+              <p>{card}</p>
+              {decks.map((targetDeck, targetDeckIndex) => {
+                if (targetDeckIndex !== deckIndex) {
+                  return (
+                    <button key={targetDeckIndex} onClick={() => moveCardToDeck(cardIndex, targetDeckIndex)}>
+                      Move to {targetDeck.name}
+                    </button>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </div>
+          ))}
+        </div>
       ))}
     </div>
   );
 };
 
-
-
-const menuItems = [
-  { id: 1, name: 'Menu 1' },
-  { id: 2, name: 'Menu 2' },
-  { id: 3, name: 'Menu 3' },
-];
-
-const breadcrumbPath = ['Home', 'Category', 'Subcategory'];
-
-const decks = [
-  { id: 1, name: 'Deck 1' },
-  { id: 2, name: 'Deck 2' },
-  { id: 3, name: 'Deck 3' },
-];
-
-const cards = [
-  { id: 1, name: 'Card 1', description: 'Description 1' },
-  { id: 2, name: 'Card 2', description: 'Description 2' },
-  { id: 3, name: 'Card 3', description: 'Description 3' },
-];
-
-const handleCreateDeck = (deckName) => {
-  // Handle deck creation
-};
-
-const handleSelectDeck = (deckId) => {
-  // Handle deck selection
-};
-
-const handleCardSortChange = (sortBy) => {
-  // Handle card sort change
-};
-
-const handleCardFilterChange = (filterValue) => {
-  // Handle card filter change
-};
-
-const handleFactionSelect = (factionId) => {
-  // Handle faction selection
-};
-
-const handleCardAdd = (cardName) => {
-  // Handle adding a card to a deck
-};
-
-const handleCardMove = (cardName) => {
-  // Handle moving a card to another deck
-};
-
-
-
-// Create main App component
-const App = () => {
-  const [decks, setDecks] = useState([]);
-
-  const handleCreateDeck = (newDeck) => {
-    setDecks([...decks, newDeck]);
-  };
-
-  return (
-    <div>
-      <h1>Create a Deck</h1>
-      <DeckForm onCreateDeck={handleCreateDeck} />
-      <Decks decks={decks} />
-
-      <Menu items={menuItems} activeItem="Menu 1" onItemClick={(itemId) => console.log(itemId)} />
-      <Breadcrumb path={breadcrumbPath} />
-      <CardListControls
-        onSortChange={(sortBy) => handleCardSortChange(sortBy)}
-        onFilterChange={(filterValue) => handleCardFilterChange(filterValue)}
-      />
-      <CardFilter filterValue="" onFilterChange={(filterValue) => handleCardFilterChange(filterValue)} />
-      <FactionButtons
-        factions={[{ id: 1, name: 'Faction 1' }, { id: 2, name: 'Faction 2' }, { id: 3, name: 'Faction 3' }]}
-        selectedFaction={1}
-        onFactionSelect={(factionId) => handleFactionSelect(factionId)}
-      />
-      <CreateDeck onCreateDeck={(deckName) => handleCreateDeck(deckName)} />
-      <SelectDeck
-        decks={decks}
-        selectedDeck={1}
-        onSelectDeck={(deckId) => handleSelectDeck(deckId)}
-      />
-      <PaginationButtons totalPages={5} currentPage={1} onPageChange={(page) => console.log(page)} />
-      <Cards cards={cards} />
-      <DeckCardControls onAddCard={(cardName) => handleCardAdd(cardName)} onMoveCard={(cardName) => handleCardMove(cardName)} />
-    </div>
-
-
-  );
-};
-
-export default App;
+export default Decks;
