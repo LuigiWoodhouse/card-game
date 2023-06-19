@@ -48,7 +48,7 @@ const AllCardsList = () => {
   return (
     <div className="container">
 
-      <Breadcrumb path={['All Cards > Select a card']} />
+<Breadcrumb path={['All Cards > Select a card']} />
       <input placeholder='Search' className="search-input" type="text" value={searchQuery} onChange={handleSearchChange} />
 
       <div className="sort">
