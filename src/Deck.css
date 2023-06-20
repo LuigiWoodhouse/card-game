@@ -1,11 +1,30 @@
-.galactic{
-    /* position: absolute;
-width: 18.59px;
-height: 18.59px;
-left: calc(50% - 18.59px/2 - 0px);
-top: calc(50% - 18.59px/2 + 0px); */
-
-/* default/neutral-gray/600 */
-
-background: #757575;
-}
+/* Decks.css */
+.deck-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 20px;
+  }
+  
+  .deck-item {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .deck-item h3 {
+    margin-top: 0;
+  }
+  
+  .deck-item p {
+    margin-bottom: 10px;
+  }
+  
+  .deck-item button {
+    margin-right: 10px;
+  }
+  
+  .plus-svg{
+    position: relative;
+    left: 160px;
+   }
